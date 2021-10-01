@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% load static %}
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+    <!-- Navigation bar -->
+    <nav class="navbar navbar-light bg-light">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="{% url 'dashboard:index' %}">Home</a>
+            </div>
+            <ul class="nav navbar-nav navbar-right">
+                {% if user.is_authenticated %}
+                <li>
+                    <a class="btn btn-link" href="#">{{ user.first_name }}-{{ user.last_name }}@{{ user.username }}</a>
+                    <a class="btn btn-link" href="{% url 'dashboard:logout' %}">Logout</a>
+                </li>
+                {% else %}
+                <li>
+                    <form class="form-inline" action="{% url 'dashboard:login' %}" method="post">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Username" name="username" >
+                            <input type="password" class="form-control" placeholder="Password" name="psw" >
+                            <button class="btn btn-primary" type="submit">Login</button>
+                            <a class="btn btn-link" href="{% url 'dashboard:registration' %}">Sign Up</a>
+                        </div>
+                    </form>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="card-deck">
+            <div class="card" style="width: 36rem;">
+                          <div class="card-body bg-light">
+                              <h3 class="card-title">Custom City Sentiment Analyser</h3>
+                                <p class="card-text">This is a Custom City Sentitment Analyser Powered by Twitter</p> 
+                                <p class="card-text">It can be used to fetch top tweets in an Area (City) and return probable Sentiment of the place</p> 
+                                
+                          </div>
+            </div>
+        </div>
+    </div>          
+    <!-- Stylize Registration form -->
+    {% if user.is_authenticated %}
+    <form action="{% url 'custom_sentiment_fetch:custom_sentiment' %}" method="post">
+        <div class="container"> <!--Style root div with .container class -->
+            {% csrf_token %}
+            <h1>Enter Query</h1>
+            <hr>
+            <div class="form-group"> <!--Style second div with .form-group class -->
+                <label for="city"><b>City</b></label>
+                <input type="text" class="form-control" placeholder="Enter City to Target" name="city" required> <!--Style input with .form-control class -->
+                <label for="query"><b>First Name</b></label>
+                <input type="text" class="form-control" placeholder="Enter Custom Query (Optional)" name="query" > <!--Style input with .form-control class -->
+                <button class="btn btn-primary" type="submit">Submit</button> <!--Style button with .btn and .btn-primary class -->
+            </div>
+        </div>
+    </form>
+    {% else %}
+    <div class="container">
+        <div class="card-deck">
+            <div class="card" style="width: 36rem;">
+                          <div class="card-body bg-light">
+                              <h3 class="card-title">Login To Continue</h3>
+                                <p class="card-text">Please Login to access this service</p> 
+                          </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if sentiment %}
+    <div class="container">
+        <div class="card-deck">
+            <div class="card" style="width: 36rem;">
+                          <div class="card-body bg-light">
+                              <h3 class="card-title">Sentiment Detected is {{sentiment}} with score: {{sentiment_score}}</h3>
+                              {% for tweet, score in tweet_list %}
+                                <p class="card-text">Tweet: {{tweet.full_text}} <br>
+                                Score: {{score}}</p> 
+                                {% endfor %}
+                            </div>
+
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if error %}
+    <div class="container">
+        <div class="card-deck">
+            <div class="card" style="width: 36rem;">
+                          <div class="card-body bg-light">
+                              <h3 class="card-title">{{error}}</h3>
+                                <p class="card-text">Please try Again</p> 
+                            </div>
+
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+
+
+</body>
